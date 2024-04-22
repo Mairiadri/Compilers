@@ -11,7 +11,7 @@ START(OK):       // START, MAIN
     //+   -> 
     //-   -> 
     //*   -> COMM2
-    /    -> COMM
+    /     -> COMM
     //%   -> 
     //<   -> 
     //>   -> 

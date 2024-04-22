@@ -49,6 +49,7 @@ NUMBER:
     \n  -> START
     0-9 -> NUMBER
 HEX:
+    0-9 -> OCT
     X -> HEX1
     x -> HEX1
     \n -> START
@@ -58,7 +59,9 @@ HEX1:
     a-z -> BAD
     0-9 -> HEX1
     \n -> START
-
+OCT:
+    0-7 -> OCT
+    \n  -> START
 BAD:           //  FAIL
     * -> BAD
     

@@ -44,15 +44,36 @@ TOKEN:
     \s  -> TOKEN
     EOF -> TOKEN
 NUMBER:
-    a-z -> BAD
-    A-Z -> BAD
     \n  -> START
     0-9 -> NUMBER
+    .   -> AKY
+    ,   -> BAD
+    A-D -> BAD
+    a-d -> BAD
+    F-Z -> BAD
+    f-z -> BAD
+    e   -> EXP
+    E   -> EXP
+AKY:
+    0-9 -> AKY
+    \n  -> START
+    e   -> EXP
+    E   -> EXP
+EXP:
+    0-9 -> EXP
+    A-Z -> BAD
+    a-z -> BAD
+    +   -> EXP
+    -   -> EXP
+    \n  -> START
 HEX:
     0-9 -> OCT
     X -> HEX1
     x -> HEX1
     \n -> START
+    e   -> EXP
+    E   -> EXP
+    .   -> AKY
 HEX1:
     A-F -> HEX1
     G-Z -> BAD
@@ -61,6 +82,8 @@ HEX1:
     \n -> START
 OCT:
     0-7 -> OCT
+    A-Z -> BAD
+    a-z -> BAD
     \n  -> START
 BAD:           //  FAIL
     * -> BAD

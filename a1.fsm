@@ -10,8 +10,8 @@ START(OK):       // START, MAIN
     //;   -> 
     //+   -> 
     //-   -> 
-    //*   -> 
-    ///   -> 
+    //*   -> COMM2
+    /    -> COMM
     //%   -> 
     //<   -> 
     //>   -> 
@@ -22,7 +22,7 @@ START(OK):       // START, MAIN
     //}   -> 
     //\\  -> 
     //\*  -> 
-    //\t  -> 
+    \t  -> START
     //!   -> 
     //@   -> 
     $   -> BAD
@@ -33,7 +33,7 @@ START(OK):       // START, MAIN
     //~   -> 
     //|   -> 
     ?   -> BAD
-    //\n  -> 
+    \n  -> START
     //\s  -> 
     EOF -> START
 TOKEN:
@@ -43,6 +43,7 @@ TOKEN:
     \n  -> START
     \s  -> TOKEN
     EOF -> TOKEN
+    \t  -> TOKEN
 NUMBER:
     \n  -> START
     0-9 -> NUMBER
@@ -85,6 +86,85 @@ OCT:
     A-Z -> BAD
     a-z -> BAD
     \n  -> START
+COMM:
+    / -> COMM1
+    * -> MULT_C
+COMM1: 
+    A-Z -> COMM1
+    a-z -> COMM1
+    0-9 -> COMM1
+    #   -> COMM1
+    "   -> COMM1
+    '   -> COMM1
+    :   -> COMM1
+    ;   -> COMM1
+    +   -> COMM1
+    -   -> COMM1
+    *   -> COMM1
+    /   -> COMM1
+    %   -> COMM1
+    <   -> COMM1
+    >   -> COMM1
+    =   -> COMM1
+    (   -> COMM1
+    )   -> COMM1
+    {   -> COMM1
+    }   -> COMM1
+    \\  -> COMM1
+    \*  -> COMM1
+    \t  -> COMM1
+    !   -> COMM1 
+    @   -> COMM1 
+    $   -> COMM1
+    ^   -> COMM1
+    &   -> COMM1
+    _   -> COMM1 
+    `   -> COMM1 
+    ~   -> COMM1 
+    |   -> COMM1
+    ?   -> COMM1
+    \n  -> START 
+    \s  -> COMM1 
+
+MULT_C: 
+    A-Z -> MULT_C
+   \*   -> MULT_C1
+    a-z -> MULT_C
+    0-9 -> MULT_C
+    #   -> MULT_C
+    "   -> MULT_C
+    '   -> MULT_C
+    :   -> MULT_C
+    ;   -> MULT_C
+    +   -> MULT_C
+    -   -> MULT_C
+    *   -> MULT_C
+    /   -> MULT_C
+    %   -> MULT_C
+    <   -> MULT_C
+    >   -> MULT_C
+    =   -> MULT_C
+    (   -> MULT_C
+    )   -> MULT_C
+    {   -> MULT_C
+    }   -> MULT_C
+    \\  -> MULT_C
+    \t  -> MULT_C
+    !   -> MULT_C 
+    @   -> MULT_C
+    $   -> MULT_C
+    ^   -> MULT_C
+    &   -> MULT_C
+    _   -> MULT_C
+    `   -> MULT_C
+    ~   -> MULT_C 
+    |   -> MULT_C
+    ?   -> MULT_C
+    \n  -> BAD
+    \s  -> MULT_C
+MULT_C1:
+    / -> START
+
 BAD:           //  FAIL
     * -> BAD
     

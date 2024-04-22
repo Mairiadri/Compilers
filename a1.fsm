@@ -32,7 +32,7 @@ START(OK):       // START, MAIN
     //`   -> 
     //~   -> 
     //|   -> 
-    ?   -> NOTOK
+    ?   -> BAD
     //\n  -> 
     //\s  -> 
     EOF -> START
@@ -44,9 +44,9 @@ TOKEN:
     \s  -> TOKEN
     EOF -> TOKEN
 NUMBER:
-    a-z -> NOTOK
-    A-Z -> NOTOK
-NOTOK:           //  FAIL
-    * -> NOTOK
+    a-z -> BAD
+    A-Z -> BAD
+BAD:           //  FAIL
+    * -> BAD
     
     

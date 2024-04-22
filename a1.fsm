@@ -1,0 +1,52 @@
+START(OK):       // START, MAIN
+    a-z -> TOKEN
+    A-Z -> TOKEN
+    //0   -> 
+    1-9 -> NUMBER
+    //#   -> 
+    //"   -> 
+    //'   -> 
+    //:   -> 
+    //;   -> 
+    //+   -> 
+    //-   -> 
+    //*   -> 
+    ///   -> 
+    //%   -> 
+    //<   -> 
+    //>   -> 
+    //=   -> 
+    //(   -> 
+    //)   -> 
+    //{   -> 
+    //}   -> 
+    //\\  -> 
+    //\*  -> 
+    //\t  -> 
+    //!   -> 
+    //@   -> 
+    //$   -> 
+    //^   -> 
+    //&   -> 
+    //_   -> 
+    //`   -> 
+    //~   -> 
+    //|   -> 
+    //?   -> NOTOK
+    //\n  -> 
+    //\s  -> 
+    EOF -> START
+TOKEN:
+    0-9 -> TOKEN
+    a-z -> TOKEN
+    A-Z -> TOKEN
+    \n  -> START
+    \s  -> TOKEN
+    EOF -> TOKEN
+NUMBER:
+    a-z -> NOTOK
+    A-Z -> NOTOK
+NOTOK:           //  FAIL
+    * -> NOTOK
+    
+    

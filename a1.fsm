@@ -32,7 +32,7 @@ START(OK):       // START, MAIN
     //`   -> 
     //~   -> 
     //|   -> 
-    //?   -> NOTOK
+    ?   -> NOTOK
     //\n  -> 
     //\s  -> 
     EOF -> START

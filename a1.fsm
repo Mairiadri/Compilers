@@ -6,7 +6,7 @@ START(OK):       // START, MAIN
     //,   -> 
     //.   -> 
     //#   -> 
-    //"   -> 
+    "     -> STR
     //'   -> 
     //:   -> 
     //;   -> 
@@ -254,7 +254,7 @@ COMP:           // character after <
     \s  -> COMP1
     EOF -> START
 COMP1:
-    = -> BAD
+    = -> BAD 
     A-Z -> TOKEN
     a-z -> TOKEN
     0-9 -> NUMBER
@@ -265,7 +265,134 @@ COMPE:
     \s  -> COMPE
     \t  -> COMPE
     \n  -> BAD
-BAD:           //  FAIL
+STR:
+    a-z -> STR
+    A-Z -> STR
+    0-9 -> STR
+    ,   -> STR
+    .   -> STR
+    #   -> STR
+    "  ->  STR3
+    '   -> STR
+    :   -> STR
+    ;   -> STR
+    +   -> STR
+    -   -> STR
+    *   -> STR
+    /   -> STR
+    %   -> STR
+    <   -> STR
+    >   -> STR
+    =   -> STR
+    [   -> STR
+    ]   -> STR
+    (   -> STR
+    )   -> STR
+    {   -> STR
+    }   -> STR
+    \\  -> STR1
+    \*  -> STR
+    \t  -> STR
+    !   -> STR
+    @   -> STR
+    $   -> STR
+    ^   -> STR
+    &   -> STR
+    _   -> STR
+    `   -> STR
+    ~   -> STR
+    |   -> STR
+    ?   -> STR
+    \n  -> BAD
+    \s  -> STR
+    EOF -> START
+STR1:          // /" START CHECK (DONE)
+    a-z -> BAD
+    A-Z -> BAD
+    0-9 -> BAD
+    ,   -> BAD
+    .   -> BAD
+    #   -> BAD
+    "   -> STR2
+    '   -> BAD
+    :   -> BAD
+    ;   -> BAD
+    +   -> BAD
+    -   -> BAD
+    *   -> BAD
+    /   -> BAD
+    %   -> BAD
+    <   -> BAD
+    >   -> BAD
+    =   -> BAD
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    \\  -> BAD
+    \*  -> BAD
+    \t  -> BAD
+    !   -> BAD
+    @   -> BAD
+    $   -> BAD
+    ^   -> BAD
+    &   -> BAD
+    _   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    |   -> BAD
+    ?   -> BAD
+    \n  -> BAD
+    \s  -> BAD
+    EOF -> START
+STR2:
+    a-z -> STR
+    A-Z -> STR
+    0-9 -> STR
+    ,   -> STR
+    .   -> STR
+    #   -> STR
+    "   -> STR
+    '   -> STR
+    :   -> STR
+    ;   -> STR
+    +   -> STR
+    -   -> STR
+    *   -> STR
+    /   -> STR
+    %   -> STR
+    <   -> STR
+    >   -> STR
+    =   -> STR
+    [   -> STR
+    ]   -> STR
+    (   -> STR
+    )   -> STR
+    {   -> STR
+    }   -> STR
+    \\  -> STR
+    \*  -> STR
+    \t  -> STR
+    !   -> STR
+    @   -> STR
+    $   -> STR
+    ^   -> STR
+    &   -> STR
+    _   -> STR
+    `   -> STR
+    ~   -> STR
+    |   -> STR
+    ?   -> STR
+    \n  -> STR
+    \s  -> STR
+    EOF -> START
+STR3:
+    " -> BAD
+    \n -> START
+    
+BAD:           //  FAIL (DONE)
     * -> BAD
     
     

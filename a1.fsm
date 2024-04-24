@@ -32,7 +32,7 @@ START(OK):       // START, MAIN
     $   -> BAD
     //^   -> 
     //&   -> 
-    //_   -> 
+    _   -> UNDERSCORE
     //`   -> 
     //~   -> 
     //|   -> 
@@ -40,7 +40,7 @@ START(OK):       // START, MAIN
     \n  -> START
     //\s  -> 
     EOF -> START
-TOKEN:
+TOKEN:           // Variable names
     0-9 -> TOKEN
     a-z -> TOKEN
     A-Z -> TOKEN
@@ -48,6 +48,7 @@ TOKEN:
     \s  -> TOKEN
     EOF -> TOKEN
     \t  -> TOKEN
+    _   -> TOKEN
 NUMBER:
     \n  -> START
     0-9 -> NUMBER
@@ -168,6 +169,47 @@ MULT_C:
     \s  -> MULT_C
 MULT_C1:
     / -> START
+UNDERSCORE:         // start with UNDERSCORE (DONE)
+    _ -> UNDERSCORE
+    \n -> BAD
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    0-9 -> START
+    !  -> BAD
+    .   -> BAD
+    ,   -> BAD
+    + -> BAD
+    #  -> BAD
+    "  -> BAD
+    '  -> BAD
+    :  -> BAD
+    ?  -> BAD
+    ;  -> BAD
+    - -> BAD
+    / -> BAD
+    %  -> BAD
+    <  -> BAD
+    >  -> BAD
+    =  -> BAD
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    \\  -> BAD
+    \*  -> BAD
+    \t  -> START
+    \s  -> START
+    @   -> BAD
+    $   -> START
+    ^   -> BAD
+    &   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    |   -> BAD
+    EOF -> START
+
 
 BAD:           //  FAIL
     * -> BAD

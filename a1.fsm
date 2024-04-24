@@ -15,8 +15,8 @@ START(OK):       // START, MAIN
     //*   -> COMM2
     /     -> COMM
     //%   -> 
-    //<   -> 
-    //>   -> 
+    <   -> COMP
+    >   -> COMP
     //=   -> 
     //[   -> 
     //]   ->
@@ -45,10 +45,12 @@ TOKEN:           // Variable names
     a-z -> TOKEN
     A-Z -> TOKEN
     \n  -> START
-    \s  -> TOKEN
+    \s  -> START
     EOF -> TOKEN
     \t  -> TOKEN
     _   -> TOKEN
+    <   -> COMP
+    >   -> COMP
 NUMBER:
     \n  -> START
     0-9 -> NUMBER
@@ -210,7 +212,59 @@ UNDERSCORE:         // start with UNDERSCORE (DONE)
     |   -> BAD
     EOF -> START
 
-
+COMP:           // character after <
+    a-z -> TOKEN
+    A-Z -> TOKEN
+    0-9 -> NUMBER
+    ,   -> BAD
+    .   -> BAD
+    #   -> BAD
+    "   -> BAD
+    '   -> BAD
+    :   -> BAD
+    ;   -> BAD
+    +   -> BAD
+    -   -> BAD
+    *   -> BAD
+    /   -> BAD
+    %   -> BAD
+    <   -> BAD
+    >   -> BAD
+    =   -> COMPE
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    \\  -> BAD
+    \*  -> BAD
+    \t   -> COMP1
+    !   -> BAD
+    @   -> BAD
+    $   -> BAD
+    ^   -> BAD
+    &   -> BAD
+    _   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    |   -> BAD
+    ?   -> BAD
+    \n  -> BAD
+    \s  -> COMP1
+    EOF -> START
+COMP1:
+    = -> BAD
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    0-9 -> NUMBER
+COMPE:
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    0-9 -> NUMBER
+    \s  -> COMPE
+    \t  -> COMPE
+    \n  -> BAD
 BAD:           //  FAIL
     * -> BAD
     

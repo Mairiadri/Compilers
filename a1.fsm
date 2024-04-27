@@ -31,11 +31,11 @@ START(OK):       // START, MAIN
     //@   -> 
     $   -> BAD
     //^   -> 
-    //&   -> 
+    &   -> AND
     _   -> UNDERSCORE
     //`   -> 
     //~   -> 
-    //|   -> 
+    |   -> OR
     ?   -> BAD
     \n  -> START
     //\s  -> 
@@ -55,6 +55,7 @@ TOKEN:           // Variable names
     +   -> PLUS
     -   -> MINUS
     *   -> BAD
+    &   -> AND
     \*  -> MULTIPLY
     \/   -> DIV
     %   -> MOD_DIV
@@ -228,7 +229,7 @@ UNDERSCORE:         // start with UNDERSCORE (DONE)
     @   -> BAD
     $   -> START
     ^   -> BAD
-    &   -> BAD
+    &   -> AND
     `   -> BAD
     ~   -> BAD
     |   -> BAD
@@ -431,6 +432,7 @@ PLUS:          // + Operator
     *   -> BAD
     \s  -> PLUS
     =   -> PLUS1
+    +   -> PLUS2
 PLUS1:
     0-9 -> NUMBER
     _   -> UNDERSCORE
@@ -440,6 +442,16 @@ PLUS1:
     \s  -> PLUS
     =   -> BAD
     -   -> MINUS
+PLUS2:          // ++ Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    -   -> MINUS
+    \n  -> START
 MINUS:         // - Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
@@ -448,6 +460,7 @@ MINUS:         // - Operator
     *   -> BAD
     \s  -> MINUS
     =   -> MINUS1
+    -   -> MINUS2
 MINUS1:
     0-9 -> NUMBER
     _   -> UNDERSCORE
@@ -457,6 +470,15 @@ MINUS1:
     \s  -> PLUS
     =   -> BAD
     -   -> MINUS
+MINUS2:
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    \n  -> START
 MULTIPLY:       // * Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
@@ -500,7 +522,7 @@ MOD_DIV:
     \s  -> MOD_DIV
     *   -> BAD
     -   -> MINUS
-NOT:
+NOT:            // ! LOGICAL NOT
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -509,7 +531,7 @@ NOT:
     *   -> BAD
     -   -> MINUS
     =   -> NOT_EQUAL
-NOT_EQUAL:
+NOT_EQUAL:        // != NOT EQUAL  
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -517,6 +539,40 @@ NOT_EQUAL:
     \s  -> MOD_DIV
     *   -> BAD
     -   -> MINUS
+AND:            // && AND Operator
+    0-9 -> NUMBER
+    -   -> NUMBER
+    &   -> AND1
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
+AND1:
+    0-9 -> NUMBER
+    -   -> NUMBER
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
+OR:            // || OR Operator
+    0-9 -> NUMBER
+    -   -> NUMBER
+    |   -> OR1
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
+OR1:
+    0-9 -> NUMBER
+    -   -> NUMBER
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
 BAD:            //  FAIL (DONE)
     * -> BAD
     

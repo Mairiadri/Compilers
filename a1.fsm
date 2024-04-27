@@ -52,12 +52,15 @@ TOKEN:           // Variable names
     <   -> COMP
     >   -> COMP
     =   -> EQUAL
-NUMBER:
+    +   -> PLUS
+    *   -> BAD
+NUMBER:             // Numbers 0-9
     \n  -> START
     0-9 -> NUMBER
     <   -> COMP
     >   -> COMP
     .   -> AKY
+    +   -> PLUS
     ,   -> BAD
     A-D -> BAD
     a-d -> BAD
@@ -70,6 +73,8 @@ AKY:
     \n  -> START
     e   -> EXP
     E   -> EXP
+    +   -> PLUS
+    *   -> BAD
 EXP:
     0-9 -> EXP
     A-Z -> BAD
@@ -403,6 +408,10 @@ EQUAL:         // = Operator and ==
     _   -> UNDERSCORE
     *   -> BAD
 PLUS:          // + Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
     *   -> BAD
 BAD:           //  FAIL (DONE)
     * -> BAD

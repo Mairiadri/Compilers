@@ -17,7 +17,7 @@ START(OK):       // START, MAIN
     //%   -> 
     <   -> COMP
     >   -> COMP
-    //=   -> 
+    =   -> BAD
     //[   -> 
     //]   ->
     //(   -> 
@@ -51,6 +51,7 @@ TOKEN:           // Variable names
     _   -> TOKEN
     <   -> COMP
     >   -> COMP
+    =   -> EQUAL
 NUMBER:
     \n  -> START
     0-9 -> NUMBER
@@ -391,7 +392,11 @@ STR2:
 STR3:
     " -> BAD
     \n -> START
-    
+EQUAL:          // = Operator and == 
+    0-9 -> NUMBER
+    -   -> NUMBER
+    =   -> EQUAL
+    *   -> BAD
 BAD:           //  FAIL (DONE)
     * -> BAD
     

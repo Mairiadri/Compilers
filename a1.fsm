@@ -414,6 +414,7 @@ STR2:
 STR3:
     "  -> BAD
     \n -> START
+    \s -> START
     *  -> BAD
 EQUAL:         // = Operator and == 
     0-9 -> NUMBER
@@ -424,6 +425,7 @@ EQUAL:         // = Operator and ==
     _   -> UNDERSCORE
     *   -> BAD
     \s  -> EQUAL
+    &   -> AND
 PLUS:          // + Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
@@ -539,7 +541,7 @@ NOT_EQUAL:        // != NOT EQUAL
     \s  -> MOD_DIV
     *   -> BAD
     -   -> MINUS
-AND:            // && AND Operator
+AND:            // && AND Operator &
     0-9 -> NUMBER
     -   -> NUMBER
     &   -> AND1

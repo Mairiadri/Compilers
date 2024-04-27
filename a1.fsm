@@ -10,13 +10,13 @@ START(OK):       // START, MAIN
     //'   -> 
     //:   -> 
     //;   -> 
-    +   -> BAD
-    //-   -> 
+    +   -> PLUS
+    -   -> MINUS
     //*   -> COMM2
-    /     -> COMM
-    //%   -> 
-    <   -> BAD
-    >   -> BAD
+    /     -> DIV
+    %     -> MOD_DIV
+    <   -> COMP
+    >   -> COMP
     =   -> BAD
     //[   -> 
     //]   ->
@@ -24,8 +24,8 @@ START(OK):       // START, MAIN
     //)   -> 
     //{   -> 
     //}   -> 
-    //\\  -> 
-    //\*  -> 
+    \\  -> COMM
+    \*  -> MULTIPLY
     \t  -> START
     //!   -> 
     //@   -> 
@@ -53,7 +53,11 @@ TOKEN:           // Variable names
     >   -> COMP
     =   -> EQUAL
     +   -> PLUS
+    -   -> MINUS
     *   -> BAD
+    \*  -> MULTIPLY
+    \/   -> DIV
+    %   -> MOD_DIV
 NUMBER:             // Numbers 0-9
     \n  -> START
     0-9 -> NUMBER
@@ -61,6 +65,10 @@ NUMBER:             // Numbers 0-9
     >   -> COMP
     .   -> AKY
     +   -> PLUS
+    -   -> MINUS
+    \*  -> MULTIPLY
+    \/  -> DIV
+    %   -> MOD_DIV
     ,   -> BAD
     A-D -> BAD
     a-d -> BAD
@@ -68,12 +76,16 @@ NUMBER:             // Numbers 0-9
     f-z -> BAD
     e   -> EXP
     E   -> EXP
+    \s  -> NUMBER
+    *   -> BAD
 AKY:
     0-9 -> AKY
     \n  -> START
     e   -> EXP
     E   -> EXP
     +   -> PLUS
+    -   -> MINUS
+    \*   -> MULTIPLY
     *   -> BAD
 EXP:
     0-9 -> EXP
@@ -175,7 +187,7 @@ MULT_C:
     ~   -> MULT_C 
     |   -> MULT_C
     ?   -> MULT_C
-    \n  -> BAD
+    \n  -> START
     \s  -> MULT_C
 MULT_C1:
     / -> START
@@ -397,8 +409,9 @@ STR2:
     \s  -> STR
     EOF -> START
 STR3:
-    " -> BAD
+    "  -> BAD
     \n -> START
+    *  -> BAD
 EQUAL:         // = Operator and == 
     0-9 -> NUMBER
     -   -> NUMBER
@@ -407,13 +420,63 @@ EQUAL:         // = Operator and ==
     a-z -> TOKEN
     _   -> UNDERSCORE
     *   -> BAD
+    \s  -> EQUAL
 PLUS:          // + Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
     a-z -> TOKEN
     *   -> BAD
-BAD:           //  FAIL (DONE)
+    \s  -> PLUS
+    =   -> PLUS1
+PLUS1:
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    -   -> MINUS
+MINUS:         // - Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> MINUS
+    =   -> MINUS1
+MINUS1:
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    -   -> MINUS
+MULTIPLY:       // * Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> MULTIPLY
+DIV:            // / (Division) Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    \s  -> DIV
+    *   -> BAD
+MOD_DIV:
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    \s  -> MOD_DIV
+    *   -> BAD
+BAD:            //  FAIL (DONE)
     * -> BAD
     
     

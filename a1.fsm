@@ -152,7 +152,6 @@ COMM1:              // Check for another /
     ?   -> COMM1
     \n  -> START 
     \s  -> COMM1
-    *   -> BAD
 MULT_C:             // 
     A-Z -> MULT_C
    \*   -> MULT_C1
@@ -189,7 +188,6 @@ MULT_C:             //
     ?   -> MULT_C
     \n  -> START
     \s  -> MULT_C
-    *   -> BAD
 MULT_C1:
     / -> START
     * -> BAD
@@ -290,7 +288,6 @@ COMPE:              // Check after <
     \t  -> COMPE
     \n  -> BAD
 STR:                // The start of "
-    *   -> BAD
     a-z -> STR
     A-Z -> STR
     0-9 -> STR

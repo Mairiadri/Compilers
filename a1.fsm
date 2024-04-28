@@ -26,12 +26,12 @@ START(OK):          // START, MAIN
     |   -> OR
     ?   -> BAD
     \\  -> BAD
-    //[   -> 
-    //]   ->
-    //(   -> 
-    //)   -> 
-    //{   -> 
-    //}   ->
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
     @   -> BAD
     ^   -> BAD
     `   -> BAD
@@ -61,6 +61,7 @@ TOKEN:              // Variable names
     \/   -> DIV
     %   -> MOD_DIV
     !   -> NOT
+    ;   -> ENDING
 NUMBER:             // Numbers 0-9
     \n  -> START
     0-9 -> NUMBER
@@ -73,6 +74,8 @@ NUMBER:             // Numbers 0-9
     \/  -> DIV
     %   -> MOD_DIV
     !   -> EQUAL
+    |   -> OR
+    &   -> AND
     ,   -> BAD
     A-D -> BAD
     a-d -> BAD
@@ -130,7 +133,6 @@ OCT:                // Octadecimal number
     *   -> BAD
 COMM:               // // Operator
     / -> COMM1
-    \*-> MULT_C
     * -> BAD  
 COMM1:              // Check for another /
     A-Z -> COMM1
@@ -168,46 +170,8 @@ COMM1:              // Check for another /
     ?   -> COMM1
     \n  -> START 
     \s  -> COMM1
-MULT_C:             // 
-    A-Z -> MULT_C
-   \*   -> MULT_C1
-    a-z -> MULT_C
-    0-9 -> MULT_C
-    #   -> MULT_C
-    "   -> MULT_C
-    '   -> MULT_C
-    :   -> MULT_C
-    ;   -> MULT_C
-    +   -> MULT_C
-    -   -> MULT_C
-    *   -> MULT_C
-    /   -> MULT_C
-    %   -> MULT_C
-    <   -> MULT_C
-    >   -> MULT_C
-    =   -> MULT_C
-    (   -> MULT_C
-    )   -> MULT_C
-    {   -> MULT_C
-    }   -> MULT_C
-    \\  -> MULT_C
-    \t  -> MULT_C
-    !   -> MULT_C 
-    @   -> MULT_C
-    $   -> MULT_C
-    ^   -> MULT_C
-    &   -> MULT_C
-    _   -> MULT_C
-    `   -> MULT_C
-    ~   -> MULT_C 
-    |   -> MULT_C
-    ?   -> MULT_C
-    \n  -> START
-    \s  -> MULT_C
-MULT_C1:
-    / -> START
-    * -> BAD
-UNDERSCORE:         // start with UNDERSCORE (DONE)
+    EOF -> BAD
+UNDERSCORE:         // start with UNDERSCORE
     _ -> UNDERSCORE
     \n -> BAD
     A-Z -> TOKEN
@@ -303,7 +267,7 @@ COMPE:              // Check after <
     \s  -> COMPE
     \t  -> COMPE
     \n  -> BAD
-CHAR:
+CHAR:               // Begin of ' 
     a-z -> CHAR
     A-Z -> CHAR
     0-9 -> CHAR
@@ -311,7 +275,7 @@ CHAR:
     .   -> CHAR
     #   -> CHAR
     "  ->  CHAR
-    '   -> CHAR
+    '   -> CHAR1
     :   -> CHAR
     ;   -> CHAR
     +   -> CHAR
@@ -341,9 +305,12 @@ CHAR:
     ~   -> CHAR
     |   -> CHAR
     ?   -> CHAR
-    \n  -> BAD
+    \n  -> START
     \s  -> CHAR
     EOF -> START    
+CHAR1:
+    \n  -> START
+    *   -> BAD
 STR:                // The start of "
     a-z -> STR
     A-Z -> STR
@@ -385,7 +352,7 @@ STR:                // The start of "
     \n  -> BAD
     \s  -> STR
     EOF -> START
-STR1:          // /" START CHECK (DONE)
+STR1:          // /" START CHECK 
     a-z -> BAD
     A-Z -> BAD
     0-9 -> BAD
@@ -426,7 +393,7 @@ STR1:          // /" START CHECK (DONE)
     \n  -> BAD
     \s  -> BAD
     EOF -> START
-STR2:
+STR2:               // Chech if user enter this """
     a-z -> STR
     A-Z -> STR
     0-9 -> STR
@@ -479,6 +446,7 @@ EQUAL:              // = Operator and ==
     A-Z -> TOKEN
     a-z -> TOKEN
     _   -> UNDERSCORE
+    '   -> CHAR
     *   -> BAD
     \s  -> EQUAL
     &   -> AND
@@ -564,6 +532,7 @@ DIV:                // / (Division) Operator
     a-z -> TOKEN
     \s  -> DIV
     *   -> BAD
+    \*  -> MULT_C
     -   -> MINUS
     =   -> DIV1
     /   -> COMM1
@@ -634,6 +603,90 @@ OR1:                // Check after the first | if another exists
     _   -> UNDERSCORE
     *   -> BAD
     \s  -> EQUAL
+MULT_C: 	        // MULTI COMMENT * operator
+    a-z -> MULT_C
+    A-Z -> MULT_C
+    0   -> MULT_C
+    1-9 -> MULT_C
+    ,   -> MULT_C
+    .   -> MULT_C
+    #   -> MULT_C 
+    "   -> MULT_C
+    '   -> MULT_C 
+    :   -> MULT_C
+    ;   -> MULT_C
+    +   -> MULT_C
+    -   -> MULT_C
+    \*  -> MULT_C1
+    /   -> MULT_C
+    %   -> MULT_C
+    <   -> MULT_C
+    >   -> MULT_C
+    =   -> MULT_C
+    *   -> MULT_C
+    !   -> MULT_C
+    $   -> MULT_C
+    &   -> MULT_C
+    _   -> MULT_C
+    |   -> MULT_C
+    ?   -> MULT_C
+    \\  -> MULT_C
+    [   -> MULT_C
+    ]   -> MULT_C
+    (   -> MULT_C
+    )   -> MULT_C
+    {   -> MULT_C
+    }   -> MULT_C
+    @   -> MULT_C
+    ^   -> MULT_C
+    `   -> MULT_C
+    ~   -> MULT_C
+    \t  -> MULT_C
+    \n  -> BAD
+    \s  -> MULT_C
+    EOF -> START
+MULT_C1:            // Check if multi comment closes with */ 
+    /   -> START
+    *   -> MULT_C
+    a-z -> BAD
+    A-Z -> BAD
+    0   -> BAD
+    1-9 -> BAD
+    ,   -> BAD
+    .   -> BAD
+    #   -> BAD 
+    "   -> BAD
+    '   -> BAD 
+    :   -> BAD
+    ;   -> BAD
+    +   -> BAD
+    -   -> BAD
+    \*  -> BAD
+    %   -> BAD
+    <   -> BAD
+    >   -> BAD
+    =   -> BAD
+    !   -> BAD
+    $   -> BAD
+    &   -> BAD
+    _   -> BAD
+    |   -> BAD
+    ?   -> BAD
+    \\  -> BAD
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    @   -> BAD
+    ^   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    \t  -> BAD
+    \n  -> BAD
+    \s  -> BAD
+    EOF -> BAD
 BAD:                //  FAIL (DONE)
     * -> BAD
     

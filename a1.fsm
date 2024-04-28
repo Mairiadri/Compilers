@@ -3,44 +3,29 @@ START(OK):          // START, MAIN
     A-Z -> TOKEN
     0   -> HEX
     1-9 -> NUMBER
-    *   -> BAD
-    //,   -> 
-    //.   -> 
-    //#   -> 
-    "     -> STR
-    //'   -> 
-    //:   -> 
+    *   -> BAD 
+    "   -> STR 
     +   -> PLUS
     -   -> MINUS
-    //*   -> COMM2
-    /     -> DIV
-    %     -> MOD_DIV
+    //* -> COMM2
+    /   -> DIV
+    %   -> MOD_DIV
     <   -> COMP
     >   -> COMP
-    =   -> EQUAL
-    //[   -> 
-    //]   ->
-    //(   -> 
-    //)   -> 
-    //{   -> 
-    //}   -> 
+    =   -> EQUAL 
     \\  -> COMM
     \*  -> MULTIPLY
-    \t  -> START
     !   -> NOT
-    //@   -> 
     $   -> BAD
-    //^   -> 
     &   -> AND
     _   -> UNDERSCORE
-    //`   -> 
-    //~   -> 
     |   -> OR
     ?   -> BAD
+    \t  -> START
     \n  -> START
     \s  -> START
     EOF -> START
-TOKEN:           // Variable names
+TOKEN:              // Variable names
     0-9 -> TOKEN
     a-z -> TOKEN
     A-Z -> TOKEN
@@ -104,6 +89,7 @@ EXP:                // E or e
     +   -> EXP
     -   -> EXP
     \n  -> START
+    *   -> BAD
 HEX:                // Hexadecimal number
     0-9 -> OCT
     X -> HEX1
@@ -112,20 +98,24 @@ HEX:                // Hexadecimal number
     e   -> EXP
     E   -> EXP
     .   -> AKY
+    *   -> BAD
 HEX1:               // Check after 0x 
     A-F -> HEX1
     G-Z -> BAD
     a-z -> BAD
     0-9 -> HEX1
-    \n -> START
+    \n  -> START
+    *   -> BAD
 OCT:                // Octadecimal number
     0-7 -> OCT
     A-Z -> BAD
     a-z -> BAD
     \n  -> START
+    *   -> BAD
 COMM:               // // Operator
     / -> COMM1
-    * -> MULT_C
+    \*-> MULT_C
+    * -> BAD  
 COMM1:              // Check for another /
     A-Z -> COMM1
     a-z -> COMM1
@@ -161,7 +151,8 @@ COMM1:              // Check for another /
     |   -> COMM1
     ?   -> COMM1
     \n  -> START 
-    \s  -> COMM1 
+    \s  -> COMM1
+    *   -> BAD
 MULT_C:             // 
     A-Z -> MULT_C
    \*   -> MULT_C1
@@ -198,8 +189,10 @@ MULT_C:             //
     ?   -> MULT_C
     \n  -> START
     \s  -> MULT_C
+    *   -> BAD
 MULT_C1:
     / -> START
+    * -> BAD
 UNDERSCORE:         // start with UNDERSCORE (DONE)
     _ -> UNDERSCORE
     \n -> BAD
@@ -240,7 +233,7 @@ UNDERSCORE:         // start with UNDERSCORE (DONE)
     ~   -> BAD
     |   -> BAD
     EOF -> START
-
+    *   -> BAD
 COMP:           // character after <
     a-z -> TOKEN
     A-Z -> TOKEN
@@ -283,18 +276,21 @@ COMP:           // character after <
     \s  -> COMP1
     EOF -> START
 COMP1:
-    = -> BAD 
+    =   -> BAD 
     A-Z -> TOKEN
     a-z -> TOKEN
     0-9 -> NUMBER
-COMPE:
+    *   -> BAD
+COMPE:              // Check after < 
     A-Z -> TOKEN
     a-z -> TOKEN
     0-9 -> NUMBER
+    *   -> BAD
     \s  -> COMPE
     \t  -> COMPE
     \n  -> BAD
-STR:
+STR:                // The start of "
+    *   -> BAD
     a-z -> STR
     A-Z -> STR
     0-9 -> STR
@@ -417,12 +413,12 @@ STR2:
     \n  -> STR
     \s  -> STR
     EOF -> START
-STR3:
+STR3:               // End of String "
     "  -> BAD
     \n -> START
     \s -> START
     *  -> BAD
-EQUAL:         // = Operator and == 
+EQUAL:              // = Operator and == 
     0-9 -> NUMBER
     -   -> NUMBER
     =   -> EQUAL
@@ -432,7 +428,7 @@ EQUAL:         // = Operator and ==
     *   -> BAD
     \s  -> EQUAL
     &   -> AND
-PLUS:          // + Operator
+PLUS:               // + Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -441,7 +437,7 @@ PLUS:          // + Operator
     \s  -> PLUS
     =   -> PLUS1
     +   -> PLUS2
-PLUS1:
+PLUS1:              // += Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -450,7 +446,7 @@ PLUS1:
     \s  -> PLUS
     =   -> BAD
     -   -> MINUS
-PLUS2:          // ++ Operator
+PLUS2:              // ++ Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -461,7 +457,7 @@ PLUS2:          // ++ Operator
     =   -> BAD
     -   -> MINUS
     \n  -> START
-MINUS:         // - Operator
+MINUS:              // - Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -470,7 +466,7 @@ MINUS:         // - Operator
     \s  -> MINUS
     =   -> MINUS1
     -   -> MINUS2
-MINUS1:
+MINUS1:             // -= Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -479,7 +475,7 @@ MINUS1:
     \s  -> PLUS
     =   -> BAD
     -   -> MINUS
-MINUS2:
+MINUS2:             // Check after the first - if second - exists
     ;   -> ENDING
     0-9 -> NUMBER
     _   -> UNDERSCORE
@@ -489,7 +485,7 @@ MINUS2:
     \s  -> PLUS
     =   -> BAD
     \n  -> START
-MULTIPLY:       // * Operator
+MULTIPLY:           // * Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -498,7 +494,7 @@ MULTIPLY:       // * Operator
     \s  -> MULTIPLY
     =   -> MULT_OP
     -   -> MINUS
-MULT_OP:         // *= multiplication assignment operator
+MULT_OP:            // *= multiplication assignment operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -507,7 +503,7 @@ MULT_OP:         // *= multiplication assignment operator
     \s  -> PLUS
     =   -> BAD
     -   -> MINUS
-DIV:            // / (Division) Operator
+DIV:                // / (Division) Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -516,7 +512,7 @@ DIV:            // / (Division) Operator
     *   -> BAD
     -   -> MINUS
     =   -> DIV1
-DIV1:           // /= Divide AND assignment operator
+DIV1:               // /= Divide AND assignment operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -524,7 +520,7 @@ DIV1:           // /= Divide AND assignment operator
     \s  -> DIV
     *   -> BAD
     -   -> MINUS
-MOD_DIV:
+MOD_DIV:            // % Operator
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -532,7 +528,7 @@ MOD_DIV:
     \s  -> MOD_DIV
     *   -> BAD
     -   -> MINUS
-NOT:            // ! LOGICAL NOT
+NOT:                // ! LOGICAL NOT
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -541,7 +537,7 @@ NOT:            // ! LOGICAL NOT
     *   -> BAD
     -   -> MINUS
     =   -> NOT_EQUAL
-NOT_EQUAL:        // != NOT EQUAL  
+NOT_EQUAL:          // != NOT EQUAL  
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN
@@ -549,7 +545,7 @@ NOT_EQUAL:        // != NOT EQUAL
     \s  -> MOD_DIV
     *   -> BAD
     -   -> MINUS
-AND:            // && AND Operator &
+AND:                // && AND Operator &
     0-9 -> NUMBER
     -   -> NUMBER
     &   -> AND1
@@ -558,7 +554,7 @@ AND:            // && AND Operator &
     _   -> UNDERSCORE
     *   -> BAD
     \s  -> EQUAL
-AND1:
+AND1:               // Check after the first &
     0-9 -> NUMBER
     -   -> NUMBER
     A-Z -> TOKEN
@@ -566,7 +562,7 @@ AND1:
     _   -> UNDERSCORE
     *   -> BAD
     \s  -> EQUAL
-OR:            // || OR Operator
+OR:                 // || OR Operator
     0-9 -> NUMBER
     -   -> NUMBER
     |   -> OR1
@@ -575,7 +571,7 @@ OR:            // || OR Operator
     _   -> UNDERSCORE
     *   -> BAD
     \s  -> EQUAL
-OR1:
+OR1:                // Check after the first | if another exists
     0-9 -> NUMBER
     -   -> NUMBER
     A-Z -> TOKEN
@@ -583,7 +579,7 @@ OR1:
     _   -> UNDERSCORE
     *   -> BAD
     \s  -> EQUAL
-BAD:            //  FAIL (DONE)
+BAD:                //  FAIL (DONE)
     * -> BAD
     
     

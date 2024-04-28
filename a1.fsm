@@ -3,24 +3,39 @@ START(OK):          // START, MAIN
     A-Z -> TOKEN
     0   -> HEX
     1-9 -> NUMBER
-    *   -> BAD 
-    "   -> STR 
+    ,   -> BAD
+    .   -> BAD 
+    #   -> BAD 
+    "   -> STR
+    '   -> CHAR 
+    :   -> BAD
+    ;   -> BAD
     +   -> PLUS
     -   -> MINUS
-    //* -> COMM2
+    \*  -> COMM2
     /   -> DIV
     %   -> MOD_DIV
     <   -> COMP
     >   -> COMP
     =   -> EQUAL 
-    \\  -> COMM
-    \*  -> MULTIPLY
+    *   -> MULTIPLY
     !   -> NOT
     $   -> BAD
     &   -> AND
     _   -> UNDERSCORE
     |   -> OR
     ?   -> BAD
+    \\  -> BAD
+    //[   -> 
+    //]   ->
+    //(   -> 
+    //)   -> 
+    //{   -> 
+    //}   ->
+    @   -> BAD
+    ^   -> BAD
+    `   -> BAD
+    ~   -> BAD
     \t  -> START
     \n  -> START
     \s  -> START
@@ -41,6 +56,7 @@ TOKEN:              // Variable names
     -   -> MINUS
     *   -> BAD
     &   -> AND
+    |   -> OR
     \*  -> MULTIPLY
     \/   -> DIV
     %   -> MOD_DIV
@@ -287,6 +303,47 @@ COMPE:              // Check after <
     \s  -> COMPE
     \t  -> COMPE
     \n  -> BAD
+CHAR:
+    a-z -> CHAR
+    A-Z -> CHAR
+    0-9 -> CHAR
+    ,   -> CHAR
+    .   -> CHAR
+    #   -> CHAR
+    "  ->  CHAR
+    '   -> CHAR
+    :   -> CHAR
+    ;   -> CHAR
+    +   -> CHAR
+    -   -> CHAR
+    *   -> CHAR
+    /   -> CHAR
+    %   -> CHAR
+    <   -> CHAR
+    >   -> CHAR
+    =   -> CHAR
+    [   -> CHAR
+    ]   -> CHAR
+    (   -> CHAR
+    )   -> CHAR
+    {   -> CHAR
+    }   -> CHAR
+    \\  -> CHAR
+    \*  -> CHAR
+    \t  -> CHAR
+    !   -> CHAR
+    @   -> CHAR
+    $   -> CHAR
+    ^   -> CHAR
+    &   -> CHAR
+    _   -> CHAR
+    `   -> CHAR
+    ~   -> CHAR
+    |   -> CHAR
+    ?   -> CHAR
+    \n  -> BAD
+    \s  -> CHAR
+    EOF -> START    
 STR:                // The start of "
     a-z -> STR
     A-Z -> STR
@@ -509,6 +566,7 @@ DIV:                // / (Division) Operator
     *   -> BAD
     -   -> MINUS
     =   -> DIV1
+    /   -> COMM1
 DIV1:               // /= Divide AND assignment operator
     0-9 -> NUMBER
     _   -> UNDERSCORE

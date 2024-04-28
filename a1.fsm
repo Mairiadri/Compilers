@@ -1,15 +1,15 @@
 START(OK):       // START, MAIN
     a-z -> TOKEN
     A-Z -> TOKEN
-    0  -> HEX
+    0   -> HEX
     1-9 -> NUMBER
+    *   -> BAD
     //,   -> 
     //.   -> 
     //#   -> 
     "     -> STR
     //'   -> 
     //:   -> 
-    //;   -> 
     +   -> PLUS
     -   -> MINUS
     //*   -> COMM2
@@ -38,7 +38,7 @@ START(OK):       // START, MAIN
     |   -> OR
     ?   -> BAD
     \n  -> START
-    //\s  -> 
+    \s  -> START
     EOF -> START
 TOKEN:           // Variable names
     0-9 -> TOKEN
@@ -80,6 +80,13 @@ NUMBER:             // Numbers 0-9
     e   -> EXP
     E   -> EXP
     \s  -> NUMBER
+    ;   -> ENDING
+    *   -> BAD
+ENDING:             // ; Operator
+    _   -> UNDERSCORE
+    a-z -> TOKEN
+    A-Z -> TOKEN
+    \n  -> START
     *   -> BAD
 AKY:
     0-9 -> AKY
@@ -449,6 +456,7 @@ PLUS2:          // ++ Operator
     _   -> UNDERSCORE
     A-Z -> TOKEN
     a-z -> TOKEN
+    ;   -> ENDING
     *   -> BAD
     \s  -> PLUS
     =   -> BAD
@@ -473,6 +481,7 @@ MINUS1:
     =   -> BAD
     -   -> MINUS
 MINUS2:
+    ;   -> ENDING
     0-9 -> NUMBER
     _   -> UNDERSCORE
     A-Z -> TOKEN

@@ -1,4 +1,4 @@
-START(OK):       // START, MAIN
+START(OK):          // START, MAIN
     a-z -> TOKEN
     A-Z -> TOKEN
     0   -> HEX
@@ -88,7 +88,7 @@ ENDING:             // ; Operator
     A-Z -> TOKEN
     \n  -> START
     *   -> BAD
-AKY:
+AKY:                // float number
     0-9 -> AKY
     \n  -> START
     e   -> EXP
@@ -97,14 +97,14 @@ AKY:
     -   -> MINUS
     \*   -> MULTIPLY
     *   -> BAD
-EXP:
+EXP:                // E or e 
     0-9 -> EXP
     A-Z -> BAD
     a-z -> BAD
     +   -> EXP
     -   -> EXP
     \n  -> START
-HEX:
+HEX:                // Hexadecimal number
     0-9 -> OCT
     X -> HEX1
     x -> HEX1
@@ -112,21 +112,21 @@ HEX:
     e   -> EXP
     E   -> EXP
     .   -> AKY
-HEX1:
+HEX1:               // Check after 0x 
     A-F -> HEX1
     G-Z -> BAD
     a-z -> BAD
     0-9 -> HEX1
     \n -> START
-OCT:
+OCT:                // Octadecimal number
     0-7 -> OCT
     A-Z -> BAD
     a-z -> BAD
     \n  -> START
-COMM:
+COMM:               // // Operator
     / -> COMM1
     * -> MULT_C
-COMM1: 
+COMM1:              // Check for another /
     A-Z -> COMM1
     a-z -> COMM1
     0-9 -> COMM1
@@ -162,8 +162,7 @@ COMM1:
     ?   -> COMM1
     \n  -> START 
     \s  -> COMM1 
-
-MULT_C: 
+MULT_C:             // 
     A-Z -> MULT_C
    \*   -> MULT_C1
     a-z -> MULT_C

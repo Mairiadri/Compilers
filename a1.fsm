@@ -74,6 +74,7 @@ NUMBER:             // Numbers 0-9
     \/  -> DIV
     %   -> MOD_DIV
     !   -> EQUAL
+    =   -> EQUAL
     |   -> OR
     &   -> AND
     ,   -> BAD

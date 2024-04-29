@@ -1,57 +1,82 @@
-START(OK):       // START, MAIN
+START(OK):          // START, MAIN
     a-z -> TOKEN
     A-Z -> TOKEN
-    0  -> HEX
+    0   -> HEX
     1-9 -> NUMBER
-    //,   -> 
-    //.   -> 
-    //#   -> 
-    //"   -> 
-    //'   -> 
-    //:   -> 
-    //;   -> 
-    //+   -> 
-    //-   -> 
-    //*   -> COMM2
-    /     -> COMM
-    //%   -> 
-    //<   -> 
-    //>   -> 
-    //=   -> 
-    //[   -> 
-    //]   ->
-    //(   -> 
-    //)   -> 
-    //{   -> 
-    //}   -> 
-    //\\  -> 
-    //\*  -> 
-    \t  -> START
-    //!   -> 
-    //@   -> 
+    ,   -> BAD
+    .   -> BAD 
+    #   -> BAD 
+    "   -> STR
+    '   -> CHAR 
+    :   -> BAD
+    ;   -> BAD
+    +   -> PLUS
+    -   -> MINUS
+    \*  -> COMM2
+    /   -> DIV
+    %   -> MOD_DIV
+    <   -> COMP
+    >   -> COMP
+    =   -> EQUAL 
+    *   -> MULTIPLY
+    !   -> NOT
     $   -> BAD
-    //^   -> 
-    //&   -> 
-    //_   -> 
-    //`   -> 
-    //~   -> 
-    //|   -> 
+    &   -> AND
+    _   -> UNDERSCORE
+    |   -> OR
     ?   -> BAD
+    \\  -> BAD
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    @   -> BAD
+    ^   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    \t  -> START
     \n  -> START
-    //\s  -> 
+    \s  -> START
     EOF -> START
-TOKEN:
+TOKEN:              // Variable names
     0-9 -> TOKEN
     a-z -> TOKEN
     A-Z -> TOKEN
     \n  -> START
-    \s  -> TOKEN
+    \s  -> START
     EOF -> TOKEN
     \t  -> TOKEN
-NUMBER:
+    _   -> TOKEN
+    <   -> COMP
+    >   -> COMP
+    =   -> EQUAL
+    +   -> PLUS
+    -   -> MINUS
+    *   -> BAD
+    &   -> AND
+    |   -> OR
+    \*  -> MULTIPLY
+    \/   -> DIV
+    %   -> MOD_DIV
+    !   -> NOT
+    ;   -> ENDING
+NUMBER:             // Numbers 0-9
     \n  -> START
     0-9 -> NUMBER
+    <   -> COMP
+    >   -> COMP
     .   -> AKY
+    +   -> PLUS
+    -   -> MINUS
+    \*  -> MULTIPLY
+    \/  -> DIV
+    %   -> MOD_DIV
+    !   -> EQUAL
+    =   -> EQUAL
+    |   -> OR
+    &   -> AND
     ,   -> BAD
     A-D -> BAD
     a-d -> BAD
@@ -59,19 +84,33 @@ NUMBER:
     f-z -> BAD
     e   -> EXP
     E   -> EXP
-AKY:
+    \s  -> NUMBER
+    ;   -> ENDING
+    *   -> BAD
+ENDING:             // ; Operator
+    _   -> UNDERSCORE
+    a-z -> TOKEN
+    A-Z -> TOKEN
+    \n  -> START
+    *   -> BAD
+AKY:                // float number
     0-9 -> AKY
     \n  -> START
     e   -> EXP
     E   -> EXP
-EXP:
+    +   -> PLUS
+    -   -> MINUS
+    \*   -> MULTIPLY
+    *   -> BAD
+EXP:                // E or e 
     0-9 -> EXP
     A-Z -> BAD
     a-z -> BAD
     +   -> EXP
     -   -> EXP
     \n  -> START
-HEX:
+    *   -> BAD
+HEX:                // Hexadecimal number
     0-9 -> OCT
     X -> HEX1
     x -> HEX1
@@ -79,21 +118,24 @@ HEX:
     e   -> EXP
     E   -> EXP
     .   -> AKY
-HEX1:
+    *   -> BAD
+HEX1:               // Check after 0x 
     A-F -> HEX1
     G-Z -> BAD
     a-z -> BAD
     0-9 -> HEX1
-    \n -> START
-OCT:
+    \n  -> START
+    *   -> BAD
+OCT:                // Octadecimal number
     0-7 -> OCT
     A-Z -> BAD
     a-z -> BAD
     \n  -> START
-COMM:
+    *   -> BAD
+COMM:               // // Operator
     / -> COMM1
-    * -> MULT_C
-COMM1: 
+    * -> BAD  
+COMM1:              // Check for another /
     A-Z -> COMM1
     a-z -> COMM1
     0-9 -> COMM1
@@ -128,48 +170,525 @@ COMM1:
     |   -> COMM1
     ?   -> COMM1
     \n  -> START 
-    \s  -> COMM1 
-
-MULT_C: 
-    A-Z -> MULT_C
-   \*   -> MULT_C1
+    \s  -> COMM1
+    EOF -> BAD
+UNDERSCORE:         // start with UNDERSCORE
+    _ -> UNDERSCORE
+    \n -> BAD
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    0-9 -> START
+    !  -> BAD
+    .   -> BAD
+    ,   -> BAD
+    + -> BAD
+    #  -> BAD
+    "  -> BAD
+    '  -> BAD
+    :  -> BAD
+    ?  -> BAD
+    ;  -> BAD
+    - -> BAD
+    / -> BAD
+    %  -> BAD
+    <  -> BAD
+    >  -> BAD
+    =  -> BAD
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    \\  -> BAD
+    \*  -> BAD
+    \t  -> START
+    \s  -> START
+    @   -> BAD
+    $   -> START
+    ^   -> BAD
+    &   -> AND
+    `   -> BAD
+    ~   -> BAD
+    |   -> BAD
+    EOF -> START
+    *   -> BAD
+COMP:           // character after <
+    a-z -> TOKEN
+    A-Z -> TOKEN
+    0-9 -> NUMBER
+    ,   -> BAD
+    .   -> BAD
+    #   -> BAD
+    "   -> BAD
+    '   -> BAD
+    :   -> BAD
+    ;   -> BAD
+    +   -> BAD
+    -   -> BAD
+    *   -> BAD
+    /   -> BAD
+    %   -> BAD
+    <   -> BAD
+    >   -> BAD
+    =   -> COMPE
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    \\  -> BAD
+    \*  -> BAD
+    \t   -> COMP1
+    !   -> BAD
+    @   -> BAD
+    $   -> BAD
+    ^   -> BAD
+    &   -> BAD
+    _   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    |   -> BAD
+    ?   -> BAD
+    \n  -> BAD
+    \s  -> COMP1
+    EOF -> START
+COMP1:
+    =   -> BAD 
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    0-9 -> NUMBER
+    *   -> BAD
+COMPE:              // Check after < 
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    0-9 -> NUMBER
+    *   -> BAD
+    \s  -> COMPE
+    \t  -> COMPE
+    \n  -> BAD
+CHAR:               // Begin of ' 
+    a-z -> CHAR
+    A-Z -> CHAR
+    0-9 -> CHAR
+    ,   -> CHAR
+    .   -> CHAR
+    #   -> CHAR
+    "  ->  CHAR
+    '   -> CHAR1
+    :   -> CHAR
+    ;   -> CHAR
+    +   -> CHAR
+    -   -> CHAR
+    *   -> CHAR
+    /   -> CHAR
+    %   -> CHAR
+    <   -> CHAR
+    >   -> CHAR
+    =   -> CHAR
+    [   -> CHAR
+    ]   -> CHAR
+    (   -> CHAR
+    )   -> CHAR
+    {   -> CHAR
+    }   -> CHAR
+    \\  -> CHAR
+    \*  -> CHAR
+    \t  -> CHAR
+    !   -> CHAR
+    @   -> CHAR
+    $   -> CHAR
+    ^   -> CHAR
+    &   -> CHAR
+    _   -> CHAR
+    `   -> CHAR
+    ~   -> CHAR
+    |   -> CHAR
+    ?   -> CHAR
+    \n  -> START
+    \s  -> CHAR
+    EOF -> START    
+CHAR1:
+    \n  -> START
+    *   -> BAD
+STR:                // The start of "
+    a-z -> STR
+    A-Z -> STR
+    0-9 -> STR
+    ,   -> STR
+    .   -> STR
+    #   -> STR
+    "  ->  STR3
+    '   -> STR
+    :   -> STR
+    ;   -> STR
+    +   -> STR
+    -   -> STR
+    *   -> STR
+    /   -> STR
+    %   -> STR
+    <   -> STR
+    >   -> STR
+    =   -> STR
+    [   -> STR
+    ]   -> STR
+    (   -> STR
+    )   -> STR
+    {   -> STR
+    }   -> STR
+    \\  -> STR1
+    \*  -> STR
+    \t  -> STR
+    !   -> STR
+    @   -> STR
+    $   -> STR
+    ^   -> STR
+    &   -> STR
+    _   -> STR
+    `   -> STR
+    ~   -> STR
+    |   -> STR
+    ?   -> STR
+    \n  -> BAD
+    \s  -> STR
+    EOF -> START
+STR1:          // /" START CHECK 
+    a-z -> BAD
+    A-Z -> BAD
+    0-9 -> BAD
+    ,   -> BAD
+    .   -> BAD
+    #   -> BAD
+    "   -> STR2
+    '   -> BAD
+    :   -> BAD
+    ;   -> BAD
+    +   -> BAD
+    -   -> BAD
+    *   -> BAD
+    /   -> BAD
+    %   -> BAD
+    <   -> BAD
+    >   -> BAD
+    =   -> BAD
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    \\  -> BAD
+    \*  -> BAD
+    \t  -> BAD
+    !   -> BAD
+    @   -> BAD
+    $   -> BAD
+    ^   -> BAD
+    &   -> BAD
+    _   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    |   -> BAD
+    ?   -> BAD
+    \n  -> BAD
+    \s  -> BAD
+    EOF -> START
+STR2:               // Chech if user enter this """
+    a-z -> STR
+    A-Z -> STR
+    0-9 -> STR
+    ,   -> STR
+    .   -> STR
+    #   -> STR
+    "   -> STR
+    '   -> STR
+    :   -> STR
+    ;   -> STR
+    +   -> STR
+    -   -> STR
+    *   -> STR
+    /   -> STR
+    %   -> STR
+    <   -> STR
+    >   -> STR
+    =   -> STR
+    [   -> STR
+    ]   -> STR
+    (   -> STR
+    )   -> STR
+    {   -> STR
+    }   -> STR
+    \\  -> STR
+    \*  -> STR
+    \t  -> STR
+    !   -> STR
+    @   -> STR
+    $   -> STR
+    ^   -> STR
+    &   -> STR
+    _   -> STR
+    `   -> STR
+    ~   -> STR
+    |   -> STR
+    ?   -> STR
+    \n  -> STR
+    \s  -> STR
+    EOF -> START
+STR3:               // End of String "
+    "  -> BAD
+    \n -> START
+    \s -> START
+    *  -> BAD
+EQUAL:              // = Operator and == 
+    0-9 -> NUMBER
+    -   -> NUMBER
+    =   -> EQUAL
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    '   -> CHAR
+    *   -> BAD
+    \s  -> EQUAL
+    &   -> AND
+PLUS:               // + Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> PLUS1
+    +   -> PLUS2
+PLUS1:              // += Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    -   -> MINUS
+PLUS2:              // ++ Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    ;   -> ENDING
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    -   -> MINUS
+    \n  -> START
+MINUS:              // - Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> MINUS
+    =   -> MINUS1
+    -   -> MINUS2
+MINUS1:             // -= Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    -   -> MINUS
+MINUS2:             // Check after the first - if second - exists
+    ;   -> ENDING
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    \n  -> START
+MULTIPLY:           // * Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> MULTIPLY
+    =   -> MULT_OP
+    -   -> MINUS
+MULT_OP:            // *= multiplication assignment operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    *   -> BAD
+    \s  -> PLUS
+    =   -> BAD
+    -   -> MINUS
+DIV:                // / (Division) Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    \s  -> DIV
+    *   -> BAD
+    \*  -> MULT_C
+    -   -> MINUS
+    =   -> DIV1
+    /   -> COMM1
+DIV1:               // /= Divide AND assignment operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    \s  -> DIV
+    *   -> BAD
+    -   -> MINUS
+MOD_DIV:            // % Operator
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    \s  -> MOD_DIV
+    *   -> BAD
+    -   -> MINUS
+NOT:                // ! LOGICAL NOT
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    \s  -> MOD_DIV
+    *   -> BAD
+    -   -> MINUS
+    =   -> NOT_EQUAL
+NOT_EQUAL:          // != NOT EQUAL  
+    0-9 -> NUMBER
+    _   -> UNDERSCORE
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    \s  -> MOD_DIV
+    *   -> BAD
+    -   -> MINUS
+AND:                // && AND Operator &
+    0-9 -> NUMBER
+    -   -> NUMBER
+    &   -> AND1
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
+AND1:               // Check after the first &
+    0-9 -> NUMBER
+    -   -> NUMBER
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
+OR:                 // || OR Operator
+    0-9 -> NUMBER
+    -   -> NUMBER
+    |   -> OR1
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
+OR1:                // Check after the first | if another exists
+    0-9 -> NUMBER
+    -   -> NUMBER
+    A-Z -> TOKEN
+    a-z -> TOKEN
+    _   -> UNDERSCORE
+    *   -> BAD
+    \s  -> EQUAL
+MULT_C: 	        // MULTI COMMENT * operator
     a-z -> MULT_C
-    0-9 -> MULT_C
-    #   -> MULT_C
+    A-Z -> MULT_C
+    0   -> MULT_C
+    1-9 -> MULT_C
+    ,   -> MULT_C
+    .   -> MULT_C
+    #   -> MULT_C 
     "   -> MULT_C
-    '   -> MULT_C
+    '   -> MULT_C 
     :   -> MULT_C
     ;   -> MULT_C
     +   -> MULT_C
     -   -> MULT_C
-    *   -> MULT_C
+    \*  -> MULT_C1
     /   -> MULT_C
     %   -> MULT_C
     <   -> MULT_C
     >   -> MULT_C
     =   -> MULT_C
+    *   -> MULT_C
+    !   -> MULT_C
+    $   -> MULT_C
+    &   -> MULT_C
+    _   -> MULT_C
+    |   -> MULT_C
+    ?   -> MULT_C
+    \\  -> MULT_C
+    [   -> MULT_C
+    ]   -> MULT_C
     (   -> MULT_C
     )   -> MULT_C
     {   -> MULT_C
     }   -> MULT_C
-    \\  -> MULT_C
-    \t  -> MULT_C
-    !   -> MULT_C 
     @   -> MULT_C
-    $   -> MULT_C
     ^   -> MULT_C
-    &   -> MULT_C
-    _   -> MULT_C
     `   -> MULT_C
-    ~   -> MULT_C 
-    |   -> MULT_C
-    ?   -> MULT_C
+    ~   -> MULT_C
+    \t  -> MULT_C
     \n  -> BAD
     \s  -> MULT_C
-MULT_C1:
-    / -> START
-
-BAD:           //  FAIL
+    EOF -> START
+MULT_C1:            // Check if multi comment closes with */ 
+    /   -> START
+    *   -> MULT_C
+    a-z -> BAD
+    A-Z -> BAD
+    0   -> BAD
+    1-9 -> BAD
+    ,   -> BAD
+    .   -> BAD
+    #   -> BAD 
+    "   -> BAD
+    '   -> BAD 
+    :   -> BAD
+    ;   -> BAD
+    +   -> BAD
+    -   -> BAD
+    \*  -> BAD
+    %   -> BAD
+    <   -> BAD
+    >   -> BAD
+    =   -> BAD
+    !   -> BAD
+    $   -> BAD
+    &   -> BAD
+    _   -> BAD
+    |   -> BAD
+    ?   -> BAD
+    \\  -> BAD
+    [   -> BAD
+    ]   -> BAD
+    (   -> BAD
+    )   -> BAD
+    {   -> BAD
+    }   -> BAD
+    @   -> BAD
+    ^   -> BAD
+    `   -> BAD
+    ~   -> BAD
+    \t  -> BAD
+    \n  -> BAD
+    \s  -> BAD
+    EOF -> BAD
+BAD:                //  FAIL (DONE)
     * -> BAD
     
     
